@@ -2,31 +2,36 @@ import React, { useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
 
 function App() {
-  const socket = io('http://localhost:8080')
+  const [socket, setSocket] = useState(null)
   const [message, setMessage] = useState('')
   const [to, setTo] = useState('')
-
+  const [messages, setMessages] = useState([])
 
   useEffect(() => {
-    socket.on('connect', () => {
-      console.log(`Connected and having socket id: ${socket.id}`)
+    const newSocket = io('http://localhost:8080')
+    setSocket(newSocket)
+
+    newSocket.on('connect', () => {
+      console.log(`Connected and having socket id: ${newSocket.id}`)
     })
 
-    socket.on('disconnect', () => {
+    newSocket.on('disconnect', () => {
       console.log('Disconnected from server')
     })
 
-    socket.on('receive', (message) => {
-      console.log(message)
+    newSocket.on('receive', (data) => {
+      setMessages((prevMessages) => [...prevMessages, data])
     })
 
+    return () => {
+      newSocket.disconnect();
+    }
   }, [])
 
   const handleSubmit = (e) => {
     e.preventDefault()
     socket.emit('message', { message, to })
     setMessage('')
-    setTo('')
   }
 
   return (
@@ -38,6 +43,14 @@ function App() {
           <input type="text" id="to" value={to} onChange={(e) => setTo(e.target.value)} />
           <input type="submit" id="send" />
         </form>
+        <div>
+          <h2>Messages</h2>
+          <ul>
+            {messages.map((message, index) => (
+              <li key={index}>{message}</li>
+            ))}
+          </ul>
+        </div>
       </div>
     </>
   )
