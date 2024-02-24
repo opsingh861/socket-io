@@ -5,7 +5,7 @@ function App() {
   const [socket, setSocket] = useState(null)
   const [message, setMessage] = useState('')
   const [to, setTo] = useState('')
-  const [messages, setMessages] = useState([])
+  // const [messages, setMessages] = useState([])
 
   useEffect(() => {
     const newSocket = io('http://localhost:8080')
@@ -19,9 +19,9 @@ function App() {
       console.log('Disconnected from server')
     })
 
-    newSocket.on('receive', (data) => {
-      setMessages((prevMessages) => [...prevMessages, data])
-    })
+    newSocket.on("receive", (message) => {
+      console.log(message)
+    });
 
     return () => {
       newSocket.disconnect();
@@ -30,7 +30,8 @@ function App() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    socket.emit('message', { message, to })
+    // socket.emit('message', { message, to })
+    socket.emit('broadcast', message)
     setMessage('')
   }
 
@@ -43,14 +44,14 @@ function App() {
           <input type="text" id="to" value={to} onChange={(e) => setTo(e.target.value)} />
           <input type="submit" id="send" />
         </form>
-        <div>
+        {/* <div>
           <h2>Messages</h2>
           <ul>
             {messages.map((message, index) => (
               <li key={index}>{message}</li>
             ))}
           </ul>
-        </div>
+        </div> */}
       </div>
     </>
   )

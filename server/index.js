@@ -32,6 +32,10 @@ io.on("connection", (socket) => {
     socket.on("message", ({ message, to }) => {
         socket.to(to).emit("receive", message);
     });
+    socket.on("broadcast", (message) => {
+        socket.broadcast.emit("receive", message);
+    });
+    
     socket.on("disconnect", () => {
         console.log("Disconnected from server");
     });
