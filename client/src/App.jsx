@@ -15,13 +15,14 @@ function App() {
       console.log(`Connected and having socket id: ${newSocket.id}`)
     })
 
+    newSocket.on('receive', (message) => {
+      console.log(`Received: ${message}`)
+    })
+
     newSocket.on('disconnect', () => {
       console.log('Disconnected from server')
     })
 
-    newSocket.on("receive", (message) => {
-      console.log(message)
-    });
 
     return () => {
       newSocket.disconnect();
@@ -30,15 +31,19 @@ function App() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    // socket.emit('message', { message, to })
-    socket.emit('broadcast', message)
+    socket.emit('message', { message, room: "room1" })
     setMessage('')
+  }
+
+  const joinRoom = (room) => {
+    socket.emit('join', { room, socketId: socket.id })
   }
 
   return (
     <>
       <div>
         <h1>Socket.io</h1>
+        <button onClick={() => joinRoom('room1')}>Join Room 1</button>
         <form onSubmit={handleSubmit}>
           <input type="text" id="message" value={message} onChange={(e) => setMessage(e.target.value)} />
           <input type="text" id="to" value={to} onChange={(e) => setTo(e.target.value)} />

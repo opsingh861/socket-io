@@ -29,13 +29,23 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
     console.log(`Connected and having socket id: ${socket.id}`);
 
-    socket.on("message", ({ message, to }) => {
-        socket.to(to).emit("receive", message);
-    });
+    // socket.on("message", ({ message, to }) => {
+    //     socket.to(to).emit("receive", message);
+    // });
+
     socket.on("broadcast", (message) => {
         socket.broadcast.emit("receive", message);
     });
-    
+
+    socket.on("join", ({ room, socketId }) => {
+        socket.join(room);
+        console.log(`Socket with id: ${socketId} joined room: ${room}`);
+    });
+
+    socket.on("message", ({ message, room }) => {
+        io.to(room).emit("receive", message);
+    });
+
     socket.on("disconnect", () => {
         console.log("Disconnected from server");
     });
